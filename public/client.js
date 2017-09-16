@@ -29,11 +29,17 @@ var app = new Vue({
 el: '#app',
 data : {
     new_name: null,
+    settings: {
+        time: 8,
+        pack: 'Default',
+        spies: 1
+    },
     room_code: null,
     name: null,
     feed: null,
     current_room: null,
     player_list: null,
+    
     
 },
 methods : {

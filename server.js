@@ -44,6 +44,8 @@ var io = require('socket.io')(server);
 
 // Map player name to socket id
 var sockets = {};
+// Map room to settings
+var roomsettings = {}
 
 io.on('connection', function(socket){
   console.log("a user connected")

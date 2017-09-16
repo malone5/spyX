@@ -20,11 +20,40 @@
           <button v-on:click="setName(new_name)">Set Name</button>
         </div>
         <div v-else>
+
           <p>Name = {{name}}</p>
-          <button v-on:click="makeRoom()">New Game</button>
-          <hr>
+
+          <!-- Join Game -->
           <input v-model="room_code" type="text" placeholder="room code">
           <button v-on:click="joinRoom(room_code, name)">Join Game</button>
+
+          <hr>
+          <!-- Create Game -->
+          <h4>Settings</h4>
+
+          <span>Time(mintues): </span>
+          <select v-model="settings.time">
+            <option>5</option>
+            <option>8</option>
+            <option>12</option>
+          </select>
+          <br>
+          
+          <span>Location Pack:</span>
+          <select v-model="settings.pack">
+            <option>Default</option>
+            <option>Adult</option>
+            <option>GameOfThrones</option>
+          </select>
+          <br>s
+
+          <span>Number of Spies:</span>
+          <select v-model="settings.spies">
+            <option>1</option>
+            <option>2</option>
+          </select>
+          <br>
+          <button v-on:click="makeRoom()">Create Lobby</button>
         </div>
       </div>
       <div v-else>
