@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SpyX</title>
+  </head>
+  <body>
+
+    <script src="https://unpkg.com/vue@2.4.3/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <div id="app">
+
+
+      <div v-if="!current_room">
+        <div v-if="!name">
+          <span>Enter Name: </span>
+          <input v-model="new_name" type="text" placeholder="Enter Name">
+          <button v-on:click="setName(new_name)">Set Name</button>
+        </div>
+        <div v-else>
+          <p>Name = {{name}}</p>
+          <button v-on:click="makeRoom()">New Game</button>
+          <hr>
+          <input v-model="room_code" type="text" placeholder="room code">
+          <button v-on:click="joinRoom(room_code, name)">Join Game</button>
+        </div>
+      </div>
+      <div v-else>
+        <p>ROOM: {{current_room}}</p>
+        <p>Player List: {{ player_list }}</p>
+      </div>
+
+      <div>
+        <h3>Feed</h3>
+        {{ feed }}
+      </div>
+
+    </div>
+
+    <!-- Vue instance / Socket io code -->
+    <script src="client.js"></script>
+
+
+  </body>
+</html>
