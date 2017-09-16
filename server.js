@@ -42,11 +42,7 @@ app.get('/', function(req, res){
 // Socket.io
 var io = require('socket.io')(server);
 
-/*
-DATABASE
-
-yeah this is pretty much our database.
-*/
+// Map player name to socket id
 var sockets = {};
 
 io.on('connection', function(socket){
@@ -62,6 +58,7 @@ io.on('connection', function(socket){
     for(room in socket.rooms){
       if(socket.id !== room) {
         socket.leave(room);
+        io.in(room).emit("playerlist change", room,  "A player has left")
         console.log("left room:", room );
       }
     }
@@ -127,12 +124,12 @@ io.on('connection', function(socket){
 
   });
 
-
-
+  socket.on('disconnecting', function(){
+    leaveRooms()
+  })
 
   /* On Disconnect */
   socket.on('disconnect', function(){
-    leaveRooms()
     delete sockets[socket.id];
     console.log('user disconnected. Deleted socket ', socket.id)
   })

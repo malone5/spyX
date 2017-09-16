@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/vue@2.4.3/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+    <script>new Clipboard('button');</script>
     <div id="app">
 
 
@@ -26,8 +28,14 @@
         </div>
       </div>
       <div v-else>
-        <p>ROOM: {{current_room}}</p>
-        <p>Player List: {{ player_list }}</p>
+        <span>ROOM: <b id="room_num" :value="current_room">{{current_room}}</b></span>
+        <!-- Copy -->
+        <button class="btn" data-clipboard-target="#room_num">
+            Copy Code
+        </button>
+        <ul>
+          <li v-for="player in player_list">{{player.nickname}}({{player.playerid}})</li>
+        </ul>
       </div>
 
       <div>
@@ -37,9 +45,8 @@
 
     </div>
 
-    <!-- Vue instance / Socket io code -->
+    <!-- Vue instance / Socket io  client code -->
     <script src="client.js"></script>
-
 
   </body>
 </html>
