@@ -1,0 +1,11 @@
+{
+    "Default": {
+        "Casino": ["Dealer", "Gambler", "Pit Boss", "Janitor"],
+        "Circus": ["Clown", "Child", "Ring Leader"],
+        "University": ["Student", "Dean", "Professor"]
+    },
+    "Adult": {
+        "Strip Club": ["Stripper", "Bouncer", "Patron"],
+        "Drug House": ["Addict", "Dealer", "Drug Lord"]
+    }
+}

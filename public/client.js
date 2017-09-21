@@ -1,10 +1,12 @@
 $(function () {
 
 
-/* Socket io. Linsten to server and react */
+
+/* Socket.io events. Linsten to server and react */
 var socket = io.connect()
 
 socket.on('joined', function(_room){
+    Cookies.set('room', _room)
     app.current_room = _room;
 });
 
@@ -22,6 +24,11 @@ socket.on('invalid room', function(){
 
 });
 
+socket.on('send packs', function(_packs){
+    app.packs = _packs;
+
+})
+
 
 
 /* Vuew Instance */
@@ -34,6 +41,7 @@ data : {
         pack: 'Default',
         spies: 1
     },
+    packs: null,
     room_code: null,
     name: null,
     feed: null,
@@ -41,6 +49,9 @@ data : {
     player_list: null,
     
     
+},
+created: function() {
+    socket.emit('get packs')
 },
 methods : {
 
@@ -50,7 +61,7 @@ methods : {
     },
 
     makeRoom: function() {
-        socket.emit('make room');
+        socket.emit('make room', this.settings);
         return false;
     },
 
@@ -58,7 +69,10 @@ methods : {
         this.current_room = _room;
         console.log("joining room")
         socket.emit('join room', _room, _playername)
-    }
+    },
+    startGame: function() {
+        socket.emit('start game', this.current_room);
+    },
 },
 }) // ./app instance
 

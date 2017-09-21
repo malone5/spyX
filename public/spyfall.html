@@ -9,9 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.js"></script>
     <script>new Clipboard('button');</script>
     <div id="app">
-
 
       <div v-if="!current_room">
         <div v-if="!name">
@@ -41,11 +41,9 @@
           
           <span>Location Pack:</span>
           <select v-model="settings.pack">
-            <option>Default</option>
-            <option>Adult</option>
-            <option>GameOfThrones</option>
+            <option v-for="pack in packs"><span>{{pack}}</span></option>
           </select>
-          <br>s
+          <br>
 
           <span>Number of Spies:</span>
           <select v-model="settings.spies">
@@ -56,15 +54,23 @@
           <button v-on:click="makeRoom()">Create Lobby</button>
         </div>
       </div>
-      <div v-else>
-        <span>ROOM: <b id="room_num" :value="current_room">{{current_room}}</b></span>
-        <!-- Copy -->
-        <button class="btn" data-clipboard-target="#room_num">
-            Copy Code
-        </button>
-        <ul>
-          <li v-for="player in player_list">{{player.nickname}}({{player.playerid}})</li>
-        </ul>
+      <div v-else> <!-- room lobby -->
+        <div v-if="active_game">
+          <h3>The game is running</h3>
+
+
+        </div>
+        <div v-else>
+          <span>ROOM: <b id="room_num" :value="current_room">{{current_room}}</b></span>
+          <!-- Copy -->
+          <button class="btn" data-clipboard-target="#room_num">
+              Copy Code
+          </button>
+          <ul>
+            <li v-for="player in player_list">{{player.nickname}}({{player.playerid}})</li>
+          </ul>
+          <button v-on:click="startGame()">Start Game</button>
+        </div>
       </div>
 
       <div>

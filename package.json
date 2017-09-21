@@ -4,7 +4,7 @@
   "description": "A game where the group must deduce who the spy is within a timeframe.",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
   },
   "author": "Sean Malone",
   "license": "ISC",

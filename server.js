@@ -5,6 +5,9 @@ var app = require('express')();
 var server = require('http').Server(app);
 var port = process.env.PORT || 3000;
 
+// Collections
+var packs = require('./collections/packs.json')
+
 // Config
 app.use(express.static('public'))
 
@@ -42,13 +45,12 @@ app.get('/', function(req, res){
 // Socket.io
 var io = require('socket.io')(server);
 
-// Map player name to socket id
-var sockets = {};
-// Map room to settings
-var roomsettings = {}
+var sockets = {}; // socket.id: player_object
+var roomsettings = {} // room#: settings_object
 
 io.on('connection', function(socket){
   console.log("a user connected")
+  socket.emit('send packs', Object.keys(packs))
 
   sockets[socket.id] = {
     playerid: socket.id,
@@ -65,8 +67,7 @@ io.on('connection', function(socket){
       }
     }
   }
-
- 
+  
   /* Set Name */
   socket.on('set name', function(_name){
     sockets[socket.id].nickname = _name
@@ -74,14 +75,11 @@ io.on('connection', function(socket){
   });
 
   /* Make Room */
-  socket.on('make room', function(_room){
-    console.log("making room...")
+  socket.on('make room', function(_settings){
+    console.log("making room...", _settings)
 
-    if(!_room || io.sockets.adapter.rooms[_room]) {
-      room = genRoom();
-    } else {
-      room = _room
-    }
+    room = genRoom();
+    roomsettings[room] = _settings
 
     socket.join(room, () => {
       socket.emit('joined', room);
@@ -104,7 +102,6 @@ io.on('connection', function(socket){
       socket.emit("joined", _room)
       io.in(_room).emit("playerlist change", _room,  "A player has joined")
     })
-
   });
 
   /* Get Room Updates */
@@ -123,9 +120,9 @@ io.on('connection', function(socket){
       })
       socket.emit("refresh playerlist", playerlist)
     });
-
   });
 
+  /* Before Disconnect */
   socket.on('disconnecting', function(){
     leaveRooms()
   })
