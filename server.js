@@ -35,6 +35,33 @@ function getPlayers(roomObj){
   return Object.keys(roomObj);
 }
 
+function pickRandom(object){
+  console.log("object: ", object)
+  if (Array.isArray(object)) {
+    return object[Math.floor(Math.random() * object.length)];
+  }
+  var keys = Object.keys(object);
+  return keys[Math.floor(keys.length * Math.random())];
+}
+
+/*
+Return a game object with the following attributes
+location, roles(array), spies(array), endtime(array)
+*/
+function genGame(_pack, _spies, _playerlist) {
+  console.log("genGames: ", _pack, _spies, _playerlist)
+  var location = pickRandom(packs[_pack])
+  var roles = packs[location]
+  var spies = []
+  
+  for (i = 0; i< _spies; i++) {
+    spies.push(pickRandom(_playerlist))
+  }
+  console.log("GAME INFO: ", location, roles, spies)
+
+
+}
+
 
 // Routes
 app.get('/', function(req, res){
@@ -47,10 +74,13 @@ var io = require('socket.io')(server);
 
 var sockets = {}; // socket.id: player_object
 var roomsettings = {} // room#: settings_object
+var games = {} // roomid: game_object
 
 io.on('connection', function(socket){
   console.log("a user connected")
-  socket.emit('send packs', Object.keys(packs))
+  socket.emit('packlist', Object.keys(packs))
+
+  socket.curr_playerlist = []
 
   sockets[socket.id] = {
     playerid: socket.id,
@@ -62,7 +92,17 @@ io.on('connection', function(socket){
     for(room in socket.rooms){
       if(socket.id !== room) {
         socket.leave(room);
-        io.in(room).emit("playerlist change", room,  "A player has left")
+
+        io.of('/').in(room).clients((error, clients) => {
+          var playerlist = []
+          if (error) throw error;
+          clients.forEach(function(key){
+            playerlist.push(sockets[key])
+          })
+          socket.curr_playerlist = playerlist;
+          io.in(room).emit("playerlist", playerlist,  "A player has left")
+        });
+
         console.log("left room:", room );
       }
     }
@@ -81,6 +121,7 @@ io.on('connection', function(socket){
     room = genRoom();
     roomsettings[room] = _settings
 
+    socket.curr_playerlist = [ sockets[socket.id].nickname, ]
     socket.join(room, () => {
       socket.emit('joined', room);
       io.in(room).emit("playerlist change", room,  "A player has joined")
@@ -100,27 +141,32 @@ io.on('connection', function(socket){
     socket.join(_room, () => {
       console.log("adding player to room ", _room)
       socket.emit("joined", _room)
-      io.in(_room).emit("playerlist change", _room,  "A player has joined")
+
+      io.of('/').in(_room).clients((error, clients) => {
+        var playerlist = []
+        if (error) throw error;
+        clients.forEach(function(key){
+          playerlist.push(sockets[key])
+        })
+        socket.curr_playerlist = playerlist;
+        io.in(_room).emit("playerlist", playerlist,  "A player has joined")
+      });
+
     })
   });
 
-  /* Get Room Updates */
-  socket.on('req playerlist', function(_room){
-    if(!io.sockets.adapter.rooms[_room]) {
-      console.log("THIS ROOM DOES NOT EXIST!")
-      return  
-    }
+  /* Start game */
+  socket.on('start game', function(_room){
+    console.log(roomsettings[_room])
+    settings = roomsettings[_room]
 
-    // Create of list of playher int he room
-    io.of('/').in(_room).clients((error, clients) => {
-      var playerlist = []
-      if (error) throw error;
-      clients.forEach(function(key){
-        playerlist.push(sockets[key])
-      })
-      socket.emit("refresh playerlist", playerlist)
-    });
+    // generate game
+    console.log("playerlist", socket.curr_playerlist)
+    var game = genGame(settings.pack, 1, socket.curr_playerlist)
+
+    // send game object to clients
   });
+
 
   /* Before Disconnect */
   socket.on('disconnecting', function(){
