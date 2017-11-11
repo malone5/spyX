@@ -20,6 +20,11 @@ socket.on('invalid room', function(){
     app.feed = "Invalid room"
 });
 
+socket.on('game update', function(_game){
+    app.game=_game
+    app.game.running = true
+})
+
 /* Vuew Instance */
 var app = new Vue({
     el: '#app',

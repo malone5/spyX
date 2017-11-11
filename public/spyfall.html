@@ -55,8 +55,9 @@
         </div>
       </div>
       <div v-else> <!-- room lobby -->
-        <div v-if="active_game">
+        <div v-if="game.running">
           <h3>The game is running</h3>
+          {{ game }}
 
 
         </div>

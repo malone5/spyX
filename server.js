@@ -48,7 +48,7 @@ function pickRandom(object){
 Return a game object with the following attributes
 location, roles(array), spies(array), endtime(array)
 */
-function genGame(_pack, _spies, _playerlist) {
+function genGame(_pack, _spies, _playerlist, _endtime) {
   console.log("genGames: ", _pack, _spies, _playerlist)
   var location = pickRandom(packs[_pack])
   var roles = packs[location]
@@ -57,7 +57,13 @@ function genGame(_pack, _spies, _playerlist) {
   for (i = 0; i< _spies; i++) {
     spies.push(pickRandom(_playerlist))
   }
-  console.log("GAME INFO: ", location, roles, spies)
+  return {
+    location: location,
+    roles: roles,
+    spes: spies,
+    endtime: _endtime
+  }
+  //console.log("GAME INFO: ", location, roles, spies)
 
 
 }
@@ -115,6 +121,8 @@ io.on('connection', function(socket){
   });
 
   /* Make Room */
+  // NOTE: Pass wround settings more explicitly. 
+  // Having a settings object can get lost in translation.
   socket.on('make room', function(_settings){
     console.log("making room...", _settings)
 
@@ -162,9 +170,12 @@ io.on('connection', function(socket){
 
     // generate game
     console.log("playerlist", socket.curr_playerlist)
-    var game = genGame(settings.pack, 1, socket.curr_playerlist)
+
+    var game = genGame(settings.pack, 1, socket.curr_playerlist, settings.time)
 
     // send game object to clients
+    io.in(_room).emit("game update", game)
+
   });
 
 
