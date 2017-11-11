@@ -121,7 +121,7 @@ io.on('connection', function(socket){
   });
 
   /* Make Room */
-  // NOTE: Pass wround settings more explicitly. 
+  // TODO: Pass wround settings more explicitly. 
   // Having a settings object can get lost in translation.
   socket.on('make room', function(_settings){
     console.log("making room...", _settings)
@@ -164,6 +164,8 @@ io.on('connection', function(socket){
   });
 
   /* Start game */
+  // TODO add status to gameroom so we can help users reconnect in the event of a disconnection
+  // More explicit settings to pass
   socket.on('start game', function(_room){
     console.log(roomsettings[_room])
     settings = roomsettings[_room]
