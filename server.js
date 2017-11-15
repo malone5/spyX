@@ -1,15 +1,32 @@
-//TODO: When player leaves room update list and feed
-
+var bodyParser = require('body-parser')
 var express = require('express');
 var app = require('express')();
 var server = require('http').Server(app);
 var port = process.env.PORT || 3000;
 
+
+// Enviroment Config
+var env = process.env.NODE_ENV || 'development';
+var config = require('./config')[env];
+
+// Routes
+var api = require('./routes/api');
+var router = require('./routes/web');
+
 // Collections
 var packs = require('./collections/packs.json')
 
-// Config
+// Database
+var mongoose = require('mongoose')
+mongoose.connect(config.database.uri, { useMongoClient: true });
+
+// Configure Express
+global.__basedir = __dirname;
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json())
 app.use(express.static('public'))
+app.use('/api', api);
+app.use('/', router);
 
 // Utility
 function makeid(size){
@@ -64,15 +81,8 @@ function genGame(_pack, _spies, _playerlist, _endtime) {
     endtime: _endtime
   }
   //console.log("GAME INFO: ", location, roles, spies)
-
-
 }
 
-
-// Routes
-app.get('/', function(req, res){
-  res.sendFile(__dirname + '/public/spyfall.html');
-});
 
 
 // Socket.io
@@ -121,13 +131,17 @@ io.on('connection', function(socket){
   });
 
   /* Make Room */
-  // TODO: Pass wround settings more explicitly. 
+  // TODO: Pass around settings more explicitly. 
   // Having a settings object can get lost in translation.
   socket.on('make room', function(_settings){
     console.log("making room...", _settings)
 
     room = genRoom();
-    roomsettings[room] = _settings
+    roomsettings[room] = {
+      time: _settings.time,
+      pack: _settings.pack,
+      spies: _settings.spies
+    }
 
     socket.curr_playerlist = [ sockets[socket.id].nickname, ]
     socket.join(room, () => {
@@ -173,7 +187,7 @@ io.on('connection', function(socket){
     // generate game
     console.log("playerlist", socket.curr_playerlist)
 
-    var game = genGame(settings.pack, 1, socket.curr_playerlist, settings.time)
+    var game = genGame(settings.pack, settings.spies, socket.curr_playerlist, settings.time)
 
     // send game object to clients
     io.in(_room).emit("game update", game)
