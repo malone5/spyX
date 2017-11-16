@@ -1,0 +1,106 @@
+<div id="home" class="container">
+  <div class="notification">
+    <a class="button is-large">Join</a>
+    <input class="input" type="text" placeholder="Rome Code">
+
+    <hr>
+  
+    <a v-on:click="makeRoom()" class="button is-large">Create</a>
+
+
+    <div class="field is-horizontal">
+      <div class="field-body">
+
+        <div class="field">
+          <label class="label">Time</label>
+          <div class="control">
+            <div class="select">
+              <select>
+                <option>8</option>
+                <option>10</option>
+                <option>12</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Spies</label>
+          <div class="control">
+            <div class="select">
+              <select>
+                <option>1</option>
+                <option>2</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Pack</label>
+          <div class="control">
+            <div class="select">
+              <select>
+                <option>Default</option>
+                <option>Adult</option>
+                <option>Star Wars</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+var app = new Vue({
+  el: '#home',
+  data : {
+      new_name: null,
+      settings: {
+          time: 8,
+          pack: 'Default',
+          spies: 1
+      },
+      game: {
+          running: false,
+          location: null,
+          roles: [],
+          spies: [],
+          endtime: null
+      },
+      packs: null,
+      room_code: null,
+      name: null,
+      feed: null,
+      current_room: null,
+      player_list: null,
+        
+  },
+
+  methods : {
+
+      makeRoom: function() {
+          axios.post('/api/rooms', {
+            time: 8,
+            spies: 1,
+            pack: 'Default'
+          })
+          .then(function (response) {
+            window.location = '/' + response.data.roomcode;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+      },
+
+  },
+}) // ./app instance
+
+
+
+</script>

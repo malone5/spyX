@@ -1,6 +1,7 @@
 var bodyParser = require('body-parser')
 var express = require('express');
 var app = require('express')();
+var exphbs = require('express-handlebars');
 var server = require('http').Server(app);
 var port = process.env.PORT || 3000;
 
@@ -22,6 +23,8 @@ mongoose.connect(config.database.uri, { useMongoClient: true });
 
 // Configure Express
 global.__basedir = __dirname;
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 app.use(express.static('public'))

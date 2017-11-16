@@ -2,13 +2,26 @@ var express = require('express');
 var api = express.Router();
 var Room = require('../models/room');
 
+// Utility
+function makeid(size){
+    var text = "";
+    var possible = "abcdefghijxlmnopqrstuvwxyz0123456789";
 
+    for( var i=0; i < size; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+
+// Tests
 api.get('/somget', function(req, res) {
     res.send('some json');
-});
+})
 
 // Rooms
 api.route('/rooms')
+
+    // Gets all availiable rooms
 
     .get(function(req, res) {
         Room.find(function(err, rooms) {
@@ -19,13 +32,16 @@ api.route('/rooms')
         });
     })
 
-    // create a bear (accessed at POST http://localhost:8080/api/bears)
+    // Creates a room
+    // TODO: Check if room exists
+
     .post(function(req, res) {
-        console.log(req.body)
+        roomcode = makeid(4)
         var room = new Room({
-            roomcode: req.body.roomcode,
+            roomcode: roomcode,
             setting_time: 8,
-            thisshoudlbreak: 123
+            setting_spies: 123,
+            setting_pack: 'Default'
         });      // create a new instance of the Bear model
 
         // save the bear and check for errors
@@ -33,7 +49,7 @@ api.route('/rooms')
             if (err)
                 res.send(err);
 
-            res.json({ message: 'Room created!' });
+            res.json({ roomcode: roomcode });
         });
 
     });
@@ -41,6 +57,8 @@ api.route('/rooms')
 
 // Room Specific
 api.route('/rooms/:roomcode')
+
+    // Gets the specific state of a room
 
     .get(function(req, res) {
 
@@ -57,7 +75,8 @@ api.route('/rooms/:roomcode')
         });
     })
 
-    // create a bear (accessed at POST http://localhost:8080/api/bears)
+    // posts a change to the rooms state
+
     .post(function(req, res) {
         console.log(req.body)
         var room = new Room();      // create a new instance of the Bear model
