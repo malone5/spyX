@@ -90,7 +90,7 @@ function genGame(_pack, _spies, _playerlist, _endtime) {
 
 // Socket.io
 var io = require('socket.io')(server);
-
+module.exports.io = io
 var sockets = {}; // socket.id: player_object
 var roomsettings = {} // room#: settings_object
 var games = {} // roomid: game_object
@@ -200,6 +200,7 @@ io.on('connection', function(socket){
 
   /* Before Disconnect */
   socket.on('disconnecting', function(){
+    console.log("leaving rooms")
     leaveRooms()
   })
 
@@ -209,7 +210,7 @@ io.on('connection', function(socket){
     console.log('user disconnected. Deleted socket ', socket.id)
   })
 
-});
+}); // .end socket io
 
 server.listen(port, function(){
   console.log('listening on *:' + port);
